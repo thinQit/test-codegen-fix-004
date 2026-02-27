@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { getUserIdFromRequest } from '@/lib/auth-helpers';
@@ -12,9 +12,9 @@ function deserializeTags(tags?: string | null): string[] {
   return tags.split(',').map(tag => tag.trim()).filter(Boolean);
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const userId = getUserIdFromRequest(request as Request & { headers: Headers });
+    const userId = getUserIdFromRequest(request);
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
@@ -59,6 +59,6 @@ export async function GET(request: Request) {
       }
     });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Server error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }
